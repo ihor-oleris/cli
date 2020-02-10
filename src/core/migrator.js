@@ -67,7 +67,12 @@ export function getMigrator (type, args) {
         if (helpers.version.getDialectName() === 'pg') {
           const customSchemaName = helpers.umzug.getSchema('migration');
           if (customSchemaName && customSchemaName !== 'public') {
-            return sequelize.createSchema(customSchemaName);
+            return sequelize.showAllSchemas().then(schemas => {
+              if (!schemas.includes(customSchemaName)) {
+                return sequelize.createSchema(customSchemaName);
+              }
+              return null;
+            });
           }
         }
 
